@@ -1,4 +1,4 @@
-## 포트폴리오 시스템 구성
+## GitHub Repository 구성
 
 8 레포가 **하나의 시스템처럼 동작**하도록 설계했습니다 (`auth-service` IdP / `mini-shop-observability` 운영 starter / `notification-hub` 알림 fan-out / `security-log-search` SIEM 이 공통 인프라 역할).
 
