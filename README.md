@@ -1,10 +1,3 @@
-# 안성수 (Sungsoo Ahn) — Backend Engineer
-
-6년차 백엔드 개발자. Java / Spring Boot / Kotlin / PostgreSQL / Kafka / K8s 위주.
-시니어 백엔드 + DevOps 방향으로 포트폴리오 8 레포를 운영 중입니다.
-
----
-
 ## 포트폴리오 시스템 구성
 
 8 레포가 **하나의 시스템처럼 동작**하도록 설계했습니다 (`auth-service` IdP / `mini-shop-observability` 운영 starter / `notification-hub` 알림 fan-out / `security-log-search` SIEM 이 공통 인프라 역할).
@@ -93,10 +86,3 @@ graph TB
 **Auth**: OAuth2 / OIDC (Authorization Server), JWT, OPA Rego (ABAC)
 **Observability**: OpenTelemetry, Prometheus, Grafana, Loki, Tempo, Micrometer
 **Infra**: Kubernetes (Kustomize), Helm, ArgoCD, Terraform, GitHub Actions
-
----
-
-## 연락처
-
-- GitHub: [@ssa1004](https://github.com/ssa1004)
-- Email: wittyahn@gmail.com
