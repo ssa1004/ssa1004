@@ -14,6 +14,7 @@ graph TB
         BILL["💳 billing-platform<br/>B2B 결제 / 청구 / 정산"]
         GPU["⚡ gpu-job-orchestrator<br/>GPU Job 스케줄러"]
         SEARCH["🔎 search-service<br/>검색 백엔드"]
+        FEED["📡 realtime-feed-service<br/>실시간 호가/체결 feed (Kotlin + WebFlux)"]
     end
 
     subgraph Common["공통 서비스"]
@@ -25,12 +26,15 @@ graph TB
     AUTH -->|JWT 검증| BILL
     AUTH -->|JWT 검증| GPU
     AUTH -->|JWT 검증| SEARCH
+    AUTH -->|JWT 검증| FEED
     AUTH -->|JWT 검증| NOTIF
     AUTH -->|JWT 검증| SIEM
 
     ORDER -->|domain events| NOTIF
     BILL -->|domain events| NOTIF
     GPU -->|domain events| NOTIF
+
+    ORDER -->|trade.matched| FEED
 
     NOTIF -->|alert.fired| SIEM
 
@@ -56,6 +60,7 @@ graph TB
 | [**billing-platform**](https://github.com/ssa1004/billing-platform) | B2B SaaS 결제 / 청구 / 정산 | Wallet/PG 결제 + Metering/Pricing/Invoice/Settlement, advisory lock + Outbox + DLQ, Spring Batch |
 | [**resell-orderbook**](https://github.com/ssa1004/resell-orderbook) | 한정판 리셀 마켓 | Bid/Ask 매칭 엔진 (advisory lock + SKIP LOCKED), 거래 라이프사이클 Saga + 보상, Spring Modulith, Outbox + Kafka |
 | [**gpu-job-orchestrator**](https://github.com/ssa1004/gpu-job-orchestrator) | GPU Job 스케줄러 (백엔드 + DevOps 풀스택) | Spring Boot, K8s, Outbox + Saga, Terraform, ArgoCD, Prometheus SLO + runbook |
+| [**realtime-feed-service**](https://github.com/ssa1004/realtime-feed-service) | 실시간 호가/체결 feed 스트리밍 (resell-orderbook 의 자매) | **100% Kotlin**, Spring WebFlux, Coroutines (Flow / structured concurrency), Project Reactor, R2DBC, Reactor Kafka, WebSocket / SSE, backpressure |
 | [**mini-shop-observability**](https://github.com/ssa1004/mini-shop-observability) | Mini e-commerce 마이크로서비스 + 관측성 | OpenTelemetry / Prometheus / Grafana / Loki / Tempo, 자체 Spring Boot Ops Toolkit (slow query / JFR / correlation MDC starter) |
 
 ---
@@ -79,8 +84,8 @@ graph TB
 
 ## 기술 스택
 
-**Language**: Java 21 (virtual threads), Kotlin 2.x
-**Framework**: Spring Boot 3.x (Modulith / WebFlux / Authorization Server 1.4), Hexagonal Architecture
+**Language**: Java 21 (virtual threads), Kotlin 2.x (Coroutines / Flow)
+**Framework**: Spring Boot 3.x (Modulith / WebFlux / Authorization Server 1.4), Hexagonal Architecture, Project Reactor
 **Data**: PostgreSQL (Flyway), Redis, OpenSearch / Elasticsearch, ClickHouse
 **Streaming**: Apache Kafka, Apache Flink 1.18
 **Auth**: OAuth2 / OIDC (Authorization Server), JWT, OPA Rego (ABAC)
