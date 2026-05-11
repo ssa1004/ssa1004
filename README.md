@@ -1,6 +1,6 @@
 ## GitHub Repository 구성
 
-8 레포가 **하나의 시스템처럼 동작**하도록 설계했습니다 (`auth-service` IdP / `mini-shop-observability` 운영 starter / `notification-hub` 알림 fan-out / `security-log-search` SIEM 이 공통 인프라 역할).
+9 레포가 **하나의 시스템처럼 동작**하도록 설계했습니다 (`auth-service` IdP / `mini-shop-observability` 운영 starter / `notification-hub` 알림 fan-out / `security-log-search` SIEM 이 공통 인프라 역할).
 
 ```mermaid
 graph TB
@@ -60,14 +60,14 @@ graph TB
 | [**billing-platform**](https://github.com/ssa1004/billing-platform) | B2B SaaS 결제 / 청구 / 정산 | Wallet/PG 결제 + Metering/Pricing/Invoice/Settlement, advisory lock + Outbox + DLQ, Spring Batch |
 | [**resell-orderbook**](https://github.com/ssa1004/resell-orderbook) | 한정판 리셀 마켓 | Bid/Ask 매칭 엔진 (advisory lock + SKIP LOCKED), 거래 라이프사이클 Saga + 보상, Spring Modulith, Outbox + Kafka |
 | [**gpu-job-orchestrator**](https://github.com/ssa1004/gpu-job-orchestrator) | GPU Job 스케줄러 (백엔드 + DevOps 풀스택) | Spring Boot, K8s, Outbox + Saga, Terraform, ArgoCD, Prometheus SLO + runbook |
-| [**realtime-feed-service**](https://github.com/ssa1004/realtime-feed-service) | 실시간 호가/체결 feed 스트리밍 (resell-orderbook 의 자매) | **100% Kotlin**, Spring WebFlux, Coroutines (Flow / structured concurrency), Project Reactor, R2DBC, Reactor Kafka, WebSocket / SSE, backpressure |
+| [**realtime-feed-service**](https://github.com/ssa1004/realtime-feed-service) | 실시간 호가/체결 feed 스트리밍 (resell-orderbook 짝) | Kotlin, Spring WebFlux, Coroutines (Flow / structured concurrency), Project Reactor, R2DBC, Reactor Kafka, WebSocket / SSE, backpressure |
 | [**mini-shop-observability**](https://github.com/ssa1004/mini-shop-observability) | Mini e-commerce 마이크로서비스 + 관측성 | OpenTelemetry / Prometheus / Grafana / Loki / Tempo, 자체 Spring Boot Ops Toolkit (slow query / JFR / correlation MDC starter) |
 
 ---
 
-## 8 레포 공통 운영 패턴
+## 공통 운영 패턴
 
-같은 패턴이 8 레포에 반복 적용되어 있습니다. 한 레포에서 본 패턴을 다른 레포에서 그대로 찾을 수 있습니다.
+같은 패턴이 9 레포에 반복 적용되어 있습니다. 한 레포에서 본 패턴을 다른 레포에서 그대로 찾을 수 있습니다.
 
 - **HikariCP** 풀 사이즈 산정 + leak detection (운영 누수 추적용 stack trace)
 - **K8s 3종 probe** (startup / readiness / liveness) 분리, readiness 는 외부 의존 (Kafka/Redis) 까지 체크

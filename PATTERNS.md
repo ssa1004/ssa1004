@@ -1,6 +1,6 @@
-# Universal Patterns — 8 레포 공통 운영 패턴
+# Universal Patterns — 9 레포 공통 운영 패턴
 
-8 portfolio 레포에서 반복적으로 사용하는 패턴. 한 레포에서 본 패턴을 다른 레포에서 그대로 찾을 수 있도록 형식 통일.
+9 portfolio 레포에서 반복적으로 사용하는 패턴. 한 레포에서 본 패턴을 다른 레포에서 그대로 찾을 수 있도록 형식 통일.
 
 각 패턴: **Problem** (왜 필요한가) → **Solution** (어떻게 해결하나) → **Where** (어느 레포에서 보이나) → **Code** (대표 위치) → **Notes** (주의점).
 
@@ -21,7 +21,7 @@ JDBC connection 누수 (close 누락) 는 운영 중 silent 하게 시작해서 
 - test 프로파일은 `leak-detection-threshold: 0` (Spring context tear-down 이 connection close 보다 늦으면 false positive).
 
 ### Where
-8 레포 모두.
+JDBC 사용 8 레포 (realtime-feed-service 는 R2DBC 라 제외).
 
 ### Code
 - `notification-hub/notification-bootstrap/src/main/resources/application.yml`
@@ -47,7 +47,7 @@ JDBC connection 누수 (close 누락) 는 운영 중 silent 하게 시작해서 
 - actuator 의 `health.probes.enabled: true` + `health.group.{readiness,liveness}` 로 매핑.
 
 ### Where
-8 레포 모두.
+9 레포 모두.
 
 ### Code
 - `notification-hub/notification-bootstrap/src/main/resources/application.yml` (`management.endpoint.health.group`)
@@ -70,7 +70,7 @@ SIGTERM 받자마자 종료하면 in-flight 요청 끊김 + Kafka consumer commi
 - `SmartLifecycle` 로 vendor 호출 / Outbox relay 단계 await
 
 ### Where
-8 레포 모두 (가장 명시적: notification-hub, resell-orderbook).
+9 레포 모두 (가장 명시적: notification-hub, resell-orderbook).
 
 ### Code
 - `notification-hub/notification-bootstrap/src/main/resources/application.yml` (`spring.lifecycle.timeout-per-shutdown-phase: 25s`)
@@ -129,7 +129,7 @@ notification-hub, mini-shop-observability (order-service), resell-orderbook, gpu
 - `notification-hub/notification-adapter-out/.../OutboxRelay.java`
 
 ### Notes
-- Kafka send 를 transaction *안* 에서 호출하는 건 일반적인 안티패턴이지만, 이 경우 *자기 행* 의 lock 만 잡고 발행해야 다른 인스턴스 중복 발행 차단. trade-off 명시.
+- Kafka send 를 transaction 안에서 호출하는 건 일반적인 안티패턴이지만, 이 경우 자기 행의 lock 만 잡고 발행해야 다른 인스턴스 중복 발행을 차단한다. trade-off 명시.
 - 행마다 트랜잭션이라 N 회 commit 이지만, batch 단위 throughput 은 충분 (50 행/초 이상).
 
 ---
@@ -150,8 +150,9 @@ notification-hub, mini-shop-observability (order-service), resell-orderbook, gpu
 resell-orderbook (거래 라이프사이클), billing-platform (settlement 흐름), mini-shop-observability (order saga).
 
 ### Code
-- `resell-orderbook/.../compensation/CompensationGuard.java`
-- `billing-platform/.../saga/SettlementSaga.java`
+- `resell-orderbook/market-application/src/main/java/com/example/market/application/service/CompensationGuard.java`
+- `mini-shop-observability/services/order-service/src/main/java/io/minishop/order/saga/OrderSagaCoordinator.java`
+- `billing-platform/billing-application/src/main/java/com/example/billing/application/service/RunSettlementService.java`
 
 ### Notes
 - 도메인 예외와 인프라 예외 (compensation log write fail) 를 분리 — log fail 이 원래 예외를 *묻으면* root cause 추적 불가.
@@ -173,8 +174,8 @@ resell-orderbook (거래 라이프사이클), billing-platform (settlement 흐�
 resell-orderbook, billing-platform, notification-hub.
 
 ### Code
-- `resell-orderbook/.../IdempotencyKeyStore.java`
-- `notification-hub/.../IdempotencyPort.java`
+- `resell-orderbook/market-application/src/main/java/com/example/market/application/port/out/IdempotencyKeyStore.java`
+- `notification-hub/notification-application/src/main/java/com/example/notification/application/port/out/IdempotencyStore.java`
 
 ### Notes
 - key 만 같고 body 다른 경우의 처리 미정의 시 보안 표면 — body fingerprint 필수.
@@ -268,9 +269,9 @@ mini-shop-observability (`correlation-mdc-starter` v0.1).
 security-log-search.
 
 ### Code
-- `security-log-search/.../enforceTenant.java`
-- `security-log-search/.../OpenSearchEventSearchAdapter.java`
-- `security-log-search/.../ClickHouseRowPolicyProvisioner.java`
+- `security-log-search/security-application/src/main/java/com/example/security/application/service/SearchLogEventsService.java` (application 단 `enforceTenant`)
+- `security-log-search/security-adapter-out/src/main/java/com/example/security/adapter/out/opensearch/OpenSearchEventSearchAdapter.java`
+- `security-log-search/security-adapter-out/src/main/java/com/example/security/adapter/out/clickhouse/ClickHouseRowPolicyProvisioner.java`
 
 ### Notes
 - `WHERE tenant_id IN (?, ?)` 같은 query 가 Row Policy 와 어떻게 상호작용하는지 검증 필요.
@@ -319,7 +320,7 @@ auth-service.
 notification-hub (vendor callback), resell-orderbook (PG webhook), billing-platform (PG webhook).
 
 ### Code
-- `notification-hub/.../HmacWebhookVerifier.java`
+- `notification-hub/notification-adapter-in/src/main/java/com/example/notification/adapter/in/security/HmacSignatureVerifier.java`
 
 ### Notes
 - timestamp 의 clock drift 허용 범위 (NTP 미동기화 시 ±60s).
@@ -365,7 +366,8 @@ notification-hub, resell-orderbook (호가 등록 rate limit), auth-service (`/t
 gpu-job-orchestrator, search-service (saved search scheduler).
 
 ### Code
-- `gpu-job-orchestrator/.../LeaderElection.java`
+- `gpu-job-orchestrator/orchestrator-api/src/main/java/com/example/gwp/orchestrator/leader/ShedLockLeaderElector.java`
+- `gpu-job-orchestrator/orchestrator-api/src/main/java/com/example/gwp/orchestrator/leader/KubernetesLeaseLeaderElector.java`
 
 ### Notes
 - `lockAtMostFor` 는 작업 시간 + buffer (예: 작업 1s + 5s buffer = 6s, 5분 같은 과대값은 takeover 지연 만듦).
@@ -398,9 +400,9 @@ mini-shop-observability (관측성 stack).
 
 ## 종합
 
-8 레포의 ADR 100+ 건이 위 16 패턴 위에 쌓여 있습니다. 같은 패턴이 다른 도메인 (결제 / 검색 / SIEM / GPU 스케줄러) 에 적용된 모양을 비교하면 *어디까지가 일반 패턴이고 어디부터가 도메인 특화인지* 가 보입니다.
+9 레포의 ADR 100+ 건이 위 16 패턴 위에 쌓여 있습니다. 같은 패턴이 다른 도메인 (결제 / 검색 / SIEM / GPU 스케줄러) 에 적용된 모양을 비교하면 어디까지가 일반 패턴이고 어디부터가 도메인 특화인지가 보입니다.
 
-각 패턴의 *trade-off* 와 *재검토 시점* 은 각 레포의 ADR 본문 참조.
+각 패턴의 trade-off 와 재검토 시점은 각 레포의 ADR 본문 참조.
 
 ---
 
