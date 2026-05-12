@@ -398,9 +398,83 @@ mini-shop-observability (관측성 stack).
 
 ---
 
+## 17. WebFlux + Coroutines boundary
+
+### Problem
+WebFlux 는 Reactor (Mono / Flux) 기반. Kotlin 으로 reactive 작성 시 Coroutines (suspend / Flow) 가 더 자연스럽지만, 두 모델 변환 정책이 명확하지 않으면 같은 호출이 두 번 subscribe 되거나 context 가 끊긴다.
+
+### Solution
+- **inbound**: `coRouter { }` + `suspend` handler 로 서버 진입 — Reactor 의 Mono/Flux 가 자동 변환.
+- **outbound**: 라이브러리가 Mono/Flux 만 제공하면 `awaitSingle()` / `asFlow()` 로 받음.
+- **boundary 명시**: domain / application 은 suspend / Flow 로 통일. adapter-in / adapter-out 만 변환 책임.
+- `mono { }` / `flow { }` builder — Reactor 측에 다시 노출할 때.
+
+### Where
+realtime-feed-service.
+
+### Code
+- `realtime-feed-service/feed-adapter-in/src/main/kotlin/com/example/feed/adapter/inbound/web/FeedRouter.kt` (`coRouter { }`)
+- `realtime-feed-service/feed-adapter-out/src/main/kotlin/com/example/feed/adapter/outbound/sink/ReactorFeedSink.kt` (`mono { }` 로 Reactor boundary)
+- `realtime-feed-service/docs/adr/0001-webflux-coroutines-boundary.md`
+
+### Notes
+- 두 모델 동시 사용 시 cancellation 양방향 전파 확인 필수.
+- `block()` 사용 절대 금지 (WebFlux thread 점유).
+
+---
+
+## 18. Backpressure 전략 (sample / bufferTimeout / window)
+
+### Problem
+Hot stream (Kafka consume → 다수 WebSocket client fan-out) 에서 producer 가 slowest consumer 보다 빠르면 메모리 폭발 또는 backpressure error.
+
+### Solution
+세 가지 전략 — 도메인에 맞춰 선택:
+- **`bufferTimeout(N, Duration)`** — N 건 또는 시간 초과 시 batch flush. throughput 우선, latency 일정 한도 내.
+- **`sample(Duration)`** — 시간 윈도우 안 마지막 샘플만 유지. 느린 client 자동 drop. 시계열 모니터 도메인 (호가 변경 같은) 적합.
+- **`window(Duration)`** + 후속 집계 — 시간 윈도우별 집계 (VWAP / volume) 후 하나로. 분석 도메인.
+
+### Where
+realtime-feed-service.
+
+### Code
+- `realtime-feed-service/feed-adapter-out/src/main/kotlin/com/example/feed/adapter/outbound/sink/ReactorFeedSink.kt`
+- `realtime-feed-service/docs/adr/0003-backpressure-strategy.md`
+
+### Notes
+- `Sinks.many().multicast().onBackpressureBuffer()` 의 한계: buffer 초과 시 `tryEmitNext` 가 `Sinks.EmitResult.FAIL_OVERFLOW` 반환 — overflow strategy 와 다름.
+- WebSocket client-side flow control 은 별도 (server 단 backpressure 만으로는 부족).
+
+---
+
+## 19. Structured concurrency + cancellation timeout
+
+### Problem
+Coroutine 을 자유롭게 launch 하면 (a) 한 launch 가 throw 시 형제 coroutine 이 무한 실행, (b) cancellation 이 전파되지 않아 leak, (c) timeout 이 명시적으로 강제되지 않음.
+
+### Solution
+- **`coroutineScope { }`** — 자식 중 하나라도 fail 시 모두 cancel. 강한 격리.
+- **`supervisorScope { }`** — 자식 fail 가 형제에게 전파되지 않음. Kafka consumer 같은 N+1 격리 (한 partition fail 이 다른 partition cancel 시키면 안 됨).
+- **`withTimeoutOrNull(Duration)`** — 시간 초과 시 null 반환 + 자동 cancel. 외부 호출 default.
+- `@PreDestroy fun stop() { scope.cancel() }` — 컴포넌트 종료 시 명시적 정리.
+
+### Where
+realtime-feed-service.
+
+### Code
+- `realtime-feed-service/feed-adapter-out/src/main/kotlin/com/example/feed/adapter/outbound/kafka/TradeMatchedConsumer.kt` (`@PreDestroy` + `scope.cancel()`)
+- `realtime-feed-service/docs/adr/0010-structured-concurrency.md`
+
+### Notes
+- `GlobalScope.launch { }` 사용 절대 금지 (root scope, cancellation 안 됨).
+- `runBlocking` 은 테스트에서만.
+- Reactor `Context` ↔ `CoroutineContext` 양방향 전파는 패턴 16 의 일부 (Reactor `Hooks.enableAutomaticContextPropagation()` 권장).
+
+---
+
 ## 종합
 
-9 레포의 ADR 100+ 건이 위 16 패턴 위에 쌓여 있습니다. 같은 패턴이 다른 도메인 (결제 / 검색 / SIEM / GPU 스케줄러) 에 적용된 모양을 비교하면 어디까지가 일반 패턴이고 어디부터가 도메인 특화인지가 보입니다.
+9 레포의 ADR 100+ 건이 위 19 패턴 위에 쌓여 있습니다. 같은 패턴이 다른 도메인 (결제 / 검색 / SIEM / GPU 스케줄러 / 실시간 reactive) 에 적용된 모양을 비교하면 어디까지가 일반 패턴이고 어디부터가 도메인 특화인지가 보입니다.
 
 각 패턴의 trade-off 와 재검토 시점은 각 레포의 ADR 본문 참조.
 
