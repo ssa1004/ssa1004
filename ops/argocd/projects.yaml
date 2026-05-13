@@ -1,0 +1,45 @@
+# ssa1004 portfolio — ArgoCD AppProject.
+#
+# 9 service 가 공유하는 project. sourceRepos 로 source 를 화이트리스트하고,
+# destinations / resource whitelist 로 배포 대상 namespace 와 리소스 종류를 제한한다.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: ssa1004-portfolio
+  namespace: argocd
+spec:
+  description: ssa1004 9-repo portfolio GitOps project
+  sourceRepos:
+    - https://github.com/ssa1004/auth-service
+    - https://github.com/ssa1004/auth-service.git
+    - https://github.com/ssa1004/security-log-search
+    - https://github.com/ssa1004/security-log-search.git
+    - https://github.com/ssa1004/notification-hub
+    - https://github.com/ssa1004/notification-hub.git
+    - https://github.com/ssa1004/search-service
+    - https://github.com/ssa1004/search-service.git
+    - https://github.com/ssa1004/billing-platform
+    - https://github.com/ssa1004/billing-platform.git
+    - https://github.com/ssa1004/resell-orderbook
+    - https://github.com/ssa1004/resell-orderbook.git
+    - https://github.com/ssa1004/gpu-job-orchestrator
+    - https://github.com/ssa1004/gpu-job-orchestrator.git
+    - https://github.com/ssa1004/mini-shop-observability
+    - https://github.com/ssa1004/mini-shop-observability.git
+    - https://github.com/ssa1004/realtime-feed-service
+    - https://github.com/ssa1004/realtime-feed-service.git
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRole
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRoleBinding
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  orphanedResources:
+    warn: true

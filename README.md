@@ -91,3 +91,18 @@ graph TB
 **Auth**: OAuth2 / OIDC (Authorization Server), JWT, OPA Rego (ABAC)
 **Observability**: OpenTelemetry, Prometheus, Grafana, Loki, Tempo, Micrometer
 **Infra**: Kubernetes (Kustomize), Helm, ArgoCD, Terraform, GitHub Actions
+
+---
+
+## Deployment
+
+9 service 의 Helm chart 를 ArgoCD ApplicationSet 한 묶음으로 동시 배포합니다 ([`ops/argocd/`](./ops/argocd/)).
+
+- `ops/argocd/projects.yaml` — AppProject `ssa1004-portfolio` (9 sourceRepos 화이트리스트)
+- `ops/argocd/applicationset.yaml` — 9 service 동시 배포 ApplicationSet (single env)
+- `ops/argocd/applicationset-{dev,prod}.yaml` — env 별 분리 (namespace `<name>-{env}` + `values-{env}.yaml`)
+
+```bash
+kubectl apply -f ops/argocd/projects.yaml
+kubectl apply -f ops/argocd/applicationset.yaml
+```

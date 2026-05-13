@@ -1,0 +1,77 @@
+# ssa1004 portfolio — prod 환경 ApplicationSet.
+#
+# prod 는 자동 sync 를 켜되 prune 은 수동 승인 (운영자 확인 후 prune).
+# valueFiles 에 values-prod.yaml override 적용.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ssa1004-portfolio-prod
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: auth-service
+            repo: auth-service
+            path: helm/auth-service
+          - name: security-log-search
+            repo: security-log-search
+            path: infrastructure/helm/security-log-search
+          - name: notification-hub
+            repo: notification-hub
+            path: helm/notification-hub
+          - name: search-service
+            repo: search-service
+            path: helm/search-service
+          - name: billing-platform
+            repo: billing-platform
+            path: helm/billing-platform
+          - name: resell-orderbook
+            repo: resell-orderbook
+            path: helm/resell-orderbook
+          - name: gpu-job-orchestrator
+            repo: gpu-job-orchestrator
+            path: helm/gpu-job-orchestrator
+          - name: mini-shop
+            repo: mini-shop-observability
+            path: helm/mini-shop
+          - name: realtime-feed-service
+            repo: realtime-feed-service
+            path: helm/realtime-feed-service
+  template:
+    metadata:
+      name: '{{name}}-prod'
+      labels:
+        app.kubernetes.io/name: '{{name}}'
+        app.kubernetes.io/part-of: ssa1004-portfolio
+        env: prod
+    spec:
+      project: ssa1004-portfolio
+      source:
+        repoURL: https://github.com/ssa1004/{{repo}}.git
+        targetRevision: HEAD
+        path: '{{path}}'
+        helm:
+          releaseName: '{{name}}'
+          valueFiles:
+            - values.yaml
+            - values-prod.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{name}}-prod'
+      syncPolicy:
+        automated:
+          # prune 은 수동. selfHeal 만 자동.
+          prune: false
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+          - PrunePropagationPolicy=foreground
+          - PruneLast=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 30s
+            factor: 2
+            maxDuration: 5m
