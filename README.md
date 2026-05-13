@@ -10,7 +10,7 @@ graph TB
     end
 
     subgraph Domain["도메인 서비스"]
-        ORDER["🏷️ resell-orderbook<br/>한정판 리셀 마켓"]
+        ORDER["🏷️ bid-ask-marketplace<br/>한정판 리셀 마켓"]
         BILL["💳 billing-platform<br/>B2B 결제 / 청구 / 정산"]
         GPU["⚡ gpu-job-orchestrator<br/>GPU Job 스케줄러"]
         SEARCH["🔎 search-service<br/>검색 백엔드"]
@@ -58,9 +58,9 @@ graph TB
 | [**notification-hub**](https://github.com/ssa1004/notification-hub) | 다채널 알림 백엔드 | PUSH / EMAIL / SMS / KAKAO, Outbox + SKIP LOCKED, Resilience4j retry+CB, HMAC webhook, multi-channel rate limit, Virtual Threads |
 | [**search-service**](https://github.com/ssa1004/search-service) | 검색 백엔드 | OpenSearch 기반 hexagonal, Saved Search alert, synonym dictionary hot reload, cursor pagination, 다국어 analyzer |
 | [**billing-platform**](https://github.com/ssa1004/billing-platform) | B2B SaaS 결제 / 청구 / 정산 | Wallet/PG 결제 + Metering/Pricing/Invoice/Settlement, advisory lock + Outbox + DLQ, Spring Batch |
-| [**resell-orderbook**](https://github.com/ssa1004/resell-orderbook) | 한정판 리셀 마켓 | Bid/Ask 매칭 엔진 (advisory lock + SKIP LOCKED), 거래 라이프사이클 Saga + 보상, Spring Modulith, Outbox + Kafka |
+| [**bid-ask-marketplace**](https://github.com/ssa1004/bid-ask-marketplace) | 한정판 리셀 마켓 | Bid/Ask 매칭 엔진 (advisory lock + SKIP LOCKED), 거래 라이프사이클 Saga + 보상, Spring Modulith, Outbox + Kafka |
 | [**gpu-job-orchestrator**](https://github.com/ssa1004/gpu-job-orchestrator) | GPU Job 스케줄러 (백엔드 + DevOps 풀스택) | Spring Boot, K8s, Outbox + Saga, Terraform, ArgoCD, Prometheus SLO + runbook |
-| [**realtime-feed-service**](https://github.com/ssa1004/realtime-feed-service) | 실시간 호가/체결 feed 스트리밍 (resell-orderbook 짝) | Kotlin, Spring WebFlux, Coroutines (Flow / structured concurrency), Project Reactor, R2DBC, Reactor Kafka, WebSocket / SSE, backpressure |
+| [**realtime-feed-service**](https://github.com/ssa1004/realtime-feed-service) | 실시간 호가/체결 feed 스트리밍 (bid-ask-marketplace 짝) | Kotlin, Spring WebFlux, Coroutines (Flow / structured concurrency), Project Reactor, R2DBC, Reactor Kafka, WebSocket / SSE, backpressure |
 | [**commerce-ops**](https://github.com/ssa1004/commerce-ops) | E-commerce 마이크로서비스 + 관측성 | OpenTelemetry / Prometheus / Grafana / Loki / Tempo, 자체 Spring Boot Ops Toolkit (slow query / JFR / correlation MDC starter) |
 
 ---

@@ -20,8 +20,8 @@ spec:
     - https://github.com/ssa1004/search-service.git
     - https://github.com/ssa1004/billing-platform
     - https://github.com/ssa1004/billing-platform.git
-    - https://github.com/ssa1004/resell-orderbook
-    - https://github.com/ssa1004/resell-orderbook.git
+    - https://github.com/ssa1004/bid-ask-marketplace
+    - https://github.com/ssa1004/bid-ask-marketplace.git
     - https://github.com/ssa1004/gpu-job-orchestrator
     - https://github.com/ssa1004/gpu-job-orchestrator.git
     - https://github.com/ssa1004/commerce-ops

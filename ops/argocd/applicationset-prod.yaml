@@ -27,7 +27,7 @@ spec:
             repo: billing-platform
             path: helm/billing-platform
           - name: resell-orderbook
-            repo: resell-orderbook
+            repo: bid-ask-marketplace
             path: helm/resell-orderbook
           - name: gpu-job-orchestrator
             repo: gpu-job-orchestrator

@@ -70,11 +70,11 @@ SIGTERM 받자마자 종료하면 in-flight 요청 끊김 + Kafka consumer commi
 - `SmartLifecycle` 로 vendor 호출 / Outbox relay 단계 await
 
 ### Where
-9 레포 모두 (가장 명시적: notification-hub, resell-orderbook).
+9 레포 모두 (가장 명시적: notification-hub, bid-ask-marketplace).
 
 ### Code
 - `notification-hub/notification-bootstrap/src/main/resources/application.yml` (`spring.lifecycle.timeout-per-shutdown-phase: 25s`)
-- `resell-orderbook/infrastructure/k8s/deployment.yaml` (`terminationGracePeriodSeconds: 60` + `preStop sleep 10s`)
+- `bid-ask-marketplace/infrastructure/k8s/deployment.yaml` (`terminationGracePeriodSeconds: 60` + `preStop sleep 10s`)
 
 ### Notes
 - 합산: K8s `preStop` (10s) + `timeout-per-shutdown-phase` (25s) + buffer = grace 60s 안에 in-flight 정리 + connection drain.
@@ -122,7 +122,7 @@ notification-hub (가장 정교), gpu-job-orchestrator, billing-platform.
 - **at-least-once 가 보장** — consumer 측 멱등성 (UNIQUE 제약 등) 으로 중복 흡수.
 
 ### Where
-notification-hub, commerce-ops (order-service), resell-orderbook, gpu-job-orchestrator, billing-platform, security-log-search.
+notification-hub, commerce-ops (order-service), bid-ask-marketplace, gpu-job-orchestrator, billing-platform, security-log-search.
 
 ### Code
 - `commerce-ops/services/order-service/src/main/java/io/minishop/order/outbox/OutboxPoller.java`
@@ -147,10 +147,10 @@ notification-hub, commerce-ops (order-service), resell-orderbook, gpu-job-orches
 - **CompensationGuard** — catch 절에서 `store.fail()` 자체가 throw 시 `addSuppressed` 로 묶어 원래 도메인 예외 잠식 방지.
 
 ### Where
-resell-orderbook (거래 라이프사이클), billing-platform (settlement 흐름), commerce-ops (order saga).
+bid-ask-marketplace (거래 라이프사이클), billing-platform (settlement 흐름), commerce-ops (order saga).
 
 ### Code
-- `resell-orderbook/market-application/src/main/java/com/example/market/application/service/CompensationGuard.java`
+- `bid-ask-marketplace/market-application/src/main/java/com/example/market/application/service/CompensationGuard.java`
 - `commerce-ops/services/order-service/src/main/java/io/minishop/order/saga/OrderSagaCoordinator.java`
 - `billing-platform/billing-application/src/main/java/com/example/billing/application/service/RunSettlementService.java`
 
@@ -171,10 +171,10 @@ resell-orderbook (거래 라이프사이클), billing-platform (settlement 흐�
 - 캐싱 storage: Redis (TTL 자동) 또는 DB 테이블.
 
 ### Where
-resell-orderbook, billing-platform, notification-hub.
+bid-ask-marketplace, billing-platform, notification-hub.
 
 ### Code
-- `resell-orderbook/market-application/src/main/java/com/example/market/application/port/out/IdempotencyKeyStore.java`
+- `bid-ask-marketplace/market-application/src/main/java/com/example/market/application/port/out/IdempotencyKeyStore.java`
 - `notification-hub/notification-application/src/main/java/com/example/notification/application/port/out/IdempotencyStore.java`
 
 ### Notes
@@ -195,10 +195,10 @@ resell-orderbook, billing-platform, notification-hub.
 - 2-tier (L1 caffeine + L2 redis) 시 같은 패턴을 양 layer 에 적용.
 
 ### Where
-resell-orderbook (`TwoTierMarketStatsCache`), search-service.
+bid-ask-marketplace (`TwoTierMarketStatsCache`), search-service.
 
 ### Code
-- `resell-orderbook/.../TwoTierMarketStatsCache.java`
+- `bid-ask-marketplace/.../TwoTierMarketStatsCache.java`
 
 ### Notes
 - polling 시간 (loader 호출 timeout) 이 loader 실제 시간보다 짧으면 fallback 으로 빠져 stampede 방어 무력화 — 충분한 timeout 필수.
@@ -217,10 +217,10 @@ resell-orderbook (`TwoTierMarketStatsCache`), search-service.
 - `WHERE (sortKey, id) > (?, ?)` 형식 — strict gt (gte 면 경계 row 중복).
 
 ### Where
-resell-orderbook (`PriceTickRepository`), search-service (saved search), security-log-search (event search).
+bid-ask-marketplace (`PriceTickRepository`), search-service (saved search), security-log-search (event search).
 
 ### Code
-- `resell-orderbook/.../SnowflakeIdGenerator.java`
+- `bid-ask-marketplace/.../SnowflakeIdGenerator.java`
 - `search-service/.../ElasticsearchSavedSearchMatchFinder.java` (cursor 의 strict `gt` 사용)
 
 ### Notes
@@ -317,7 +317,7 @@ auth-service.
 - secret rotation grace window — 새 secret 추가 후 7일 grace.
 
 ### Where
-notification-hub (vendor callback), resell-orderbook (PG webhook), billing-platform (PG webhook).
+notification-hub (vendor callback), bid-ask-marketplace (PG webhook), billing-platform (PG webhook).
 
 ### Code
 - `notification-hub/notification-adapter-in/src/main/java/com/example/notification/adapter/in/security/HmacSignatureVerifier.java`
@@ -340,7 +340,7 @@ notification-hub (vendor callback), resell-orderbook (PG webhook), billing-platf
 - token bucket (fixed window) — window-ms 별 limit. 더 정교한 sliding window / GCRA 는 별도.
 
 ### Where
-notification-hub, resell-orderbook (호가 등록 rate limit), auth-service (`/token` endpoint).
+notification-hub, bid-ask-marketplace (호가 등록 rate limit), auth-service (`/token` endpoint).
 
 ### Code
 - `notification-hub/.../RedisRateLimiter.java` (`LUA_BATCH_TRY_CONSUME`)

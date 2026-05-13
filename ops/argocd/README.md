@@ -39,7 +39,7 @@ argocd app list
 | notification-hub | `ssa1004/notification-hub` | `helm/notification-hub` | `notification-hub` |
 | search-service | `ssa1004/search-service` | `helm/search-service` | `search-service` |
 | billing-platform | `ssa1004/billing-platform` | `helm/billing-platform` | `billing-platform` |
-| resell-orderbook | `ssa1004/resell-orderbook` | `helm/resell-orderbook` | `resell-orderbook` |
+| resell-orderbook | `ssa1004/bid-ask-marketplace` | `helm/resell-orderbook` | `resell-orderbook` |
 | gpu-job-orchestrator | `ssa1004/gpu-job-orchestrator` | `helm/gpu-job-orchestrator` | `gpu-job-orchestrator` |
 | mini-shop | `ssa1004/commerce-ops` | `helm/mini-shop` | `mini-shop` |
 | realtime-feed-service | `ssa1004/realtime-feed-service` | `helm/realtime-feed-service` | `realtime-feed-service` |
