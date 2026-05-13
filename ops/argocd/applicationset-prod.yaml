@@ -16,7 +16,7 @@ spec:
             path: helm/auth-service
           - name: security-log-search
             repo: security-log-search
-            path: infrastructure/helm/security-log-search
+            path: helm/security-log-search
           - name: notification-hub
             repo: notification-hub
             path: helm/notification-hub

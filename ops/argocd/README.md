@@ -35,7 +35,7 @@ argocd app list
 | service | repo | chart path | namespace (single env) |
 |---------|------|------------|-----------------------|
 | auth-service | `ssa1004/auth-service` | `helm/auth-service` | `auth-service` |
-| security-log-search | `ssa1004/security-log-search` | `infrastructure/helm/security-log-search` | `security-log-search` |
+| security-log-search | `ssa1004/security-log-search` | `helm/security-log-search` | `security-log-search` |
 | notification-hub | `ssa1004/notification-hub` | `helm/notification-hub` | `notification-hub` |
 | search-service | `ssa1004/search-service` | `helm/search-service` | `search-service` |
 | billing-platform | `ssa1004/billing-platform` | `helm/billing-platform` | `billing-platform` |

@@ -8,8 +8,7 @@
 #   kubectl apply -f ops/argocd/applicationset.yaml
 #
 # 주의:
-#   - security-log-search 만 chart 위치가 infrastructure/helm/security-log-search 이고,
-#     나머지 8 service 는 helm/<chart-name>/ 에 위치한다.
+#   - 9 service 모두 helm/<chart-name>/ 위치 (예외 없음).
 #   - dev / prod 분기는 applicationset-dev.yaml / applicationset-prod.yaml 참고.
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -25,7 +24,7 @@ spec:
             path: helm/auth-service
           - name: security-log-search
             repo: security-log-search
-            path: infrastructure/helm/security-log-search
+            path: helm/security-log-search
           - name: notification-hub
             repo: notification-hub
             path: helm/notification-hub
