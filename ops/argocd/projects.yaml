@@ -24,8 +24,8 @@ spec:
     - https://github.com/ssa1004/resell-orderbook.git
     - https://github.com/ssa1004/gpu-job-orchestrator
     - https://github.com/ssa1004/gpu-job-orchestrator.git
-    - https://github.com/ssa1004/mini-shop-observability
-    - https://github.com/ssa1004/mini-shop-observability.git
+    - https://github.com/ssa1004/commerce-ops
+    - https://github.com/ssa1004/commerce-ops.git
     - https://github.com/ssa1004/realtime-feed-service
     - https://github.com/ssa1004/realtime-feed-service.git
   destinations:

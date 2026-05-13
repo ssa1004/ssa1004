@@ -41,7 +41,7 @@ argocd app list
 | billing-platform | `ssa1004/billing-platform` | `helm/billing-platform` | `billing-platform` |
 | resell-orderbook | `ssa1004/resell-orderbook` | `helm/resell-orderbook` | `resell-orderbook` |
 | gpu-job-orchestrator | `ssa1004/gpu-job-orchestrator` | `helm/gpu-job-orchestrator` | `gpu-job-orchestrator` |
-| mini-shop | `ssa1004/mini-shop-observability` | `helm/mini-shop` | `mini-shop` |
+| mini-shop | `ssa1004/commerce-ops` | `helm/mini-shop` | `mini-shop` |
 | realtime-feed-service | `ssa1004/realtime-feed-service` | `helm/realtime-feed-service` | `realtime-feed-service` |
 
 > `security-log-search` 만 chart 가 `infrastructure/helm/` 하위에 있다. 나머지 8 개는 `helm/<chart-name>/` 표준 위치.

@@ -1,12 +1,12 @@
 ## GitHub Repository 구성
 
-9 레포가 **하나의 시스템처럼 동작**하도록 설계했습니다 (`auth-service` IdP / `mini-shop-observability` 운영 starter / `notification-hub` 알림 fan-out / `security-log-search` SIEM 이 공통 인프라 역할).
+9 레포가 **하나의 시스템처럼 동작**하도록 설계했습니다 (`auth-service` IdP / `commerce-ops` 운영 starter / `notification-hub` 알림 fan-out / `security-log-search` SIEM 이 공통 인프라 역할).
 
 ```mermaid
 graph TB
     subgraph Infra["공통 인프라"]
         AUTH["🔐 auth-service<br/>OAuth2 / OIDC IdP"]
-        OBS["📊 mini-shop-observability<br/>관측성 + Spring Boot Ops Toolkit"]
+        OBS["📊 commerce-ops<br/>관측성 + Spring Boot Ops Toolkit"]
     end
 
     subgraph Domain["도메인 서비스"]
@@ -61,7 +61,7 @@ graph TB
 | [**resell-orderbook**](https://github.com/ssa1004/resell-orderbook) | 한정판 리셀 마켓 | Bid/Ask 매칭 엔진 (advisory lock + SKIP LOCKED), 거래 라이프사이클 Saga + 보상, Spring Modulith, Outbox + Kafka |
 | [**gpu-job-orchestrator**](https://github.com/ssa1004/gpu-job-orchestrator) | GPU Job 스케줄러 (백엔드 + DevOps 풀스택) | Spring Boot, K8s, Outbox + Saga, Terraform, ArgoCD, Prometheus SLO + runbook |
 | [**realtime-feed-service**](https://github.com/ssa1004/realtime-feed-service) | 실시간 호가/체결 feed 스트리밍 (resell-orderbook 짝) | Kotlin, Spring WebFlux, Coroutines (Flow / structured concurrency), Project Reactor, R2DBC, Reactor Kafka, WebSocket / SSE, backpressure |
-| [**mini-shop-observability**](https://github.com/ssa1004/mini-shop-observability) | Mini e-commerce 마이크로서비스 + 관측성 | OpenTelemetry / Prometheus / Grafana / Loki / Tempo, 자체 Spring Boot Ops Toolkit (slow query / JFR / correlation MDC starter) |
+| [**commerce-ops**](https://github.com/ssa1004/commerce-ops) | E-commerce 마이크로서비스 + 관측성 | OpenTelemetry / Prometheus / Grafana / Loki / Tempo, 자체 Spring Boot Ops Toolkit (slow query / JFR / correlation MDC starter) |
 
 ---
 

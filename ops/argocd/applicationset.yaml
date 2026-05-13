@@ -41,7 +41,7 @@ spec:
             repo: gpu-job-orchestrator
             path: helm/gpu-job-orchestrator
           - name: mini-shop
-            repo: mini-shop-observability
+            repo: commerce-ops
             path: helm/mini-shop
           - name: realtime-feed-service
             repo: realtime-feed-service

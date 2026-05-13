@@ -122,10 +122,10 @@ notification-hub (가장 정교), gpu-job-orchestrator, billing-platform.
 - **at-least-once 가 보장** — consumer 측 멱등성 (UNIQUE 제약 등) 으로 중복 흡수.
 
 ### Where
-notification-hub, mini-shop-observability (order-service), resell-orderbook, gpu-job-orchestrator, billing-platform, security-log-search.
+notification-hub, commerce-ops (order-service), resell-orderbook, gpu-job-orchestrator, billing-platform, security-log-search.
 
 ### Code
-- `mini-shop-observability/services/order-service/src/main/java/io/minishop/order/outbox/OutboxPoller.java`
+- `commerce-ops/services/order-service/src/main/java/io/minishop/order/outbox/OutboxPoller.java`
 - `notification-hub/notification-adapter-out/.../OutboxRelay.java`
 
 ### Notes
@@ -147,11 +147,11 @@ notification-hub, mini-shop-observability (order-service), resell-orderbook, gpu
 - **CompensationGuard** — catch 절에서 `store.fail()` 자체가 throw 시 `addSuppressed` 로 묶어 원래 도메인 예외 잠식 방지.
 
 ### Where
-resell-orderbook (거래 라이프사이클), billing-platform (settlement 흐름), mini-shop-observability (order saga).
+resell-orderbook (거래 라이프사이클), billing-platform (settlement 흐름), commerce-ops (order saga).
 
 ### Code
 - `resell-orderbook/market-application/src/main/java/com/example/market/application/service/CompensationGuard.java`
-- `mini-shop-observability/services/order-service/src/main/java/io/minishop/order/saga/OrderSagaCoordinator.java`
+- `commerce-ops/services/order-service/src/main/java/io/minishop/order/saga/OrderSagaCoordinator.java`
 - `billing-platform/billing-application/src/main/java/com/example/billing/application/service/RunSettlementService.java`
 
 ### Notes
@@ -241,10 +241,10 @@ resell-orderbook (`PriceTickRepository`), search-service (saved search), securit
 - async / executor / Kafka consumer 의 wrapping decorator 로 propagation.
 
 ### Where
-mini-shop-observability (`correlation-mdc-starter` v0.1).
+commerce-ops (`correlation-mdc-starter` v0.1).
 
 ### Code
-- `mini-shop-observability/modules/correlation-mdc-starter/.../CorrelationMdcFilter.java`
+- `commerce-ops/modules/correlation-mdc-starter/.../CorrelationMdcFilter.java`
 
 ### Notes
 - WebFlux / non-web 환경은 별도 Reactor context propagation 필요 — v0.1 은 Servlet 한정.
@@ -387,10 +387,10 @@ gpu-job-orchestrator, search-service (saved search scheduler).
 - exemplars — 메트릭에 trace 샘플 link.
 
 ### Where
-mini-shop-observability (관측성 stack).
+commerce-ops (관측성 stack).
 
 ### Code
-- `mini-shop-observability/infra/docker-compose.yml` (Tempo + Loki + Grafana data source 설정)
+- `commerce-ops/infra/docker-compose.yml` (Tempo + Loki + Grafana data source 설정)
 
 ### Notes
 - correlation-mdc-starter 가 Servlet → MDC propagation. Reactor / async 는 별도 wrapping.
