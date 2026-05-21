@@ -1,6 +1,6 @@
-# ops/argocd — 9 service GitOps 통합 배포
+# ops/argocd — 10 service GitOps 통합 배포
 
-`ssa1004` 9 개 레포의 Helm chart 를 ArgoCD ApplicationSet 한 묶음으로 배포한다.
+`ssa1004` 10 개 레포의 Helm chart 를 ArgoCD ApplicationSet 한 묶음으로 배포한다.
 각 레포가 자기 chart 를 관리하고, profile repo 는 이를 묶는 manifest 만 들고 있다.
 
 ## 구성
@@ -30,7 +30,7 @@ kubectl get applications -n argocd
 argocd app list
 ```
 
-## 9 service chart 매핑
+## 10 service chart 매핑
 
 | service | repo | chart path | namespace (single env) |
 |---------|------|------------|-----------------------|
@@ -43,8 +43,9 @@ argocd app list
 | gpu-job-orchestrator | `ssa1004/gpu-job-orchestrator` | `helm/gpu-job-orchestrator` | `gpu-job-orchestrator` |
 | mini-shop | `ssa1004/commerce-ops` | `helm/mini-shop` | `mini-shop` |
 | realtime-feed-service | `ssa1004/realtime-feed-service` | `helm/realtime-feed-service` | `realtime-feed-service` |
+| graphql-gateway | `ssa1004/graphql-gateway` | `helm/graphql-gateway` | `graphql-gateway` |
 
-> `security-log-search` 만 chart 가 `infrastructure/helm/` 하위에 있다. 나머지 8 개는 `helm/<chart-name>/` 표준 위치.
+> 10 service 모두 `helm/<chart-name>/` 표준 위치에 chart 를 둔다 (예외 없음).
 
 ## 환경 분기 가이드
 
@@ -85,14 +86,14 @@ template:
 
 - ArgoCD v2.x 가 설치된 cluster (`argocd` namespace).
 - profile repo 가 ArgoCD source repo 로 등록되어 있을 필요는 없다 (ApplicationSet 의 source 는
-  9 개 service repo 라 ApplicationSet manifest 자체는 `kubectl apply` 로 적용한다).
+  10 개 service repo 라 ApplicationSet manifest 자체는 `kubectl apply` 로 적용한다).
 - 각 service repo 에 Helm chart 가 `Chart.yaml` + `values.yaml` 로 존재해야 한다 (Phase 3a).
 - dev / prod 분기를 쓰려면 각 chart 에 `values-dev.yaml` / `values-prod.yaml` 추가 필요.
 
 ## 점검
 
 ```bash
-# ApplicationSet 자체가 9 개 Application 을 생성했는지
+# ApplicationSet 자체가 10 개 Application 을 생성했는지
 kubectl get appset ssa1004-portfolio -n argocd
 kubectl get applications -n argocd -l app.kubernetes.io/part-of=ssa1004-portfolio
 

@@ -1,9 +1,13 @@
 ## GitHub Repository 구성
 
-9 레포가 **하나의 시스템처럼 동작**하도록 설계했습니다 (`auth-service` IdP / `commerce-ops` 운영 starter / `notification-hub` 알림 fan-out / `security-log-search` SIEM 이 공통 인프라 역할).
+10 레포가 **하나의 시스템처럼 동작**하도록 설계했습니다 (`auth-service` IdP / `commerce-ops` 운영 starter / `notification-hub` 알림 fan-out / `security-log-search` SIEM / `graphql-gateway` 통합 facade 가 공통 인프라 역할).
 
 ```mermaid
 graph TB
+    subgraph Facade["통합 facade"]
+        GQL["🔮 graphql-gateway<br/>9 service 통합 GraphQL"]
+    end
+
     subgraph Infra["공통 인프라"]
         AUTH["🔐 auth-service<br/>OAuth2 / OIDC IdP"]
         OBS["📊 commerce-ops<br/>관측성 + Spring Boot Ops Toolkit"]
@@ -21,6 +25,9 @@ graph TB
         NOTIF["📨 notification-hub<br/>다채널 알림"]
         SIEM["🛡️ security-log-search<br/>SIEM 보안 로그"]
     end
+
+    GQL -->|JWT + REST 조인| AUTH
+    GQL -.->|REST 조회 / DataLoader| Domain
 
     AUTH -->|JWT 검증| ORDER
     AUTH -->|JWT 검증| BILL
@@ -62,6 +69,7 @@ graph TB
 | [**gpu-job-orchestrator**](https://github.com/ssa1004/gpu-job-orchestrator) | GPU Job 스케줄러 (백엔드 + DevOps 풀스택) | Spring Boot, K8s, Outbox + Saga, Terraform, ArgoCD, Prometheus SLO + runbook |
 | [**realtime-feed-service**](https://github.com/ssa1004/realtime-feed-service) | 실시간 호가/체결 feed 스트리밍 (bid-ask-marketplace 짝) | Kotlin, Spring WebFlux, Coroutines (Flow / structured concurrency), Project Reactor, R2DBC, Reactor Kafka, WebSocket / SSE, backpressure |
 | [**commerce-ops**](https://github.com/ssa1004/commerce-ops) | E-commerce 마이크로서비스 + 관측성 | OpenTelemetry / Prometheus / Grafana / Loki / Tempo, 자체 Spring Boot Ops Toolkit (slow query / JFR / correlation MDC starter) |
+| [**graphql-gateway**](https://github.com/ssa1004/graphql-gateway) | 9 service 통합 GraphQL gateway | Spring for GraphQL, DataLoader N+1 batching, JWT + token relay, Resilience4j (downstream CB/retry), Relay cursor connection, query complexity 제한 |
 
 ---
 
@@ -73,7 +81,7 @@ graph TB
 
 ## 공통 운영 패턴
 
-같은 패턴이 9 레포에 반복 적용되어 있습니다. 한 레포에서 본 패턴을 다른 레포에서 그대로 찾을 수 있습니다.
+같은 패턴이 10 레포에 반복 적용되어 있습니다. 한 레포에서 본 패턴을 다른 레포에서 그대로 찾을 수 있습니다.
 
 - **HikariCP** 풀 사이즈 산정 + leak detection (운영 누수 추적용 stack trace)
 - **K8s 3종 probe** (startup / readiness / liveness) 분리, readiness 는 외부 의존 (Kafka/Redis) 까지 체크
@@ -102,10 +110,10 @@ graph TB
 
 ## Deployment
 
-9 service 의 Helm chart 를 ArgoCD ApplicationSet 한 묶음으로 동시 배포합니다 ([`ops/argocd/`](./ops/argocd/)).
+10 service 의 Helm chart 를 ArgoCD ApplicationSet 한 묶음으로 동시 배포합니다 ([`ops/argocd/`](./ops/argocd/)).
 
-- `ops/argocd/projects.yaml` — AppProject `ssa1004-portfolio` (9 sourceRepos 화이트리스트)
-- `ops/argocd/applicationset.yaml` — 9 service 동시 배포 ApplicationSet (single env)
+- `ops/argocd/projects.yaml` — AppProject `ssa1004-portfolio` (10 sourceRepos 화이트리스트)
+- `ops/argocd/applicationset.yaml` — 10 service 동시 배포 ApplicationSet (single env)
 - `ops/argocd/applicationset-{dev,prod}.yaml` — env 별 분리 (namespace `<name>-{env}` + `values-{env}.yaml`)
 
 ```bash

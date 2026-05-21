@@ -46,6 +46,9 @@ spec:
           - name: realtime-feed-service
             repo: realtime-feed-service
             path: helm/realtime-feed-service
+          - name: graphql-gateway
+            repo: graphql-gateway
+            path: helm/graphql-gateway
   template:
     metadata:
       name: '{{name}}'

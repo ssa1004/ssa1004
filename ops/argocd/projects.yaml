@@ -28,6 +28,8 @@ spec:
     - https://github.com/ssa1004/commerce-ops.git
     - https://github.com/ssa1004/realtime-feed-service
     - https://github.com/ssa1004/realtime-feed-service.git
+    - https://github.com/ssa1004/graphql-gateway
+    - https://github.com/ssa1004/graphql-gateway.git
   destinations:
     - namespace: '*'
       server: https://kubernetes.default.svc
