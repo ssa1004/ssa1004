@@ -10,7 +10,7 @@
 
 ## 통합 뷰어
 
-`docs/api/index.html` — Redoc standalone (CDN). 드롭다운으로 9 서비스 spec 을 전환한다.
+`docs/api/index.html` — Redoc standalone (CDN). 드롭다운으로 11 개 spec 을 전환한다.
 
 GitHub 에서 HTML 은 raw 로 열면 렌더링되지 않으므로 아래 중 하나로 본다.
 

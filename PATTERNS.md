@@ -21,7 +21,7 @@ JDBC connection 누수 (close 누락) 는 운영 중 silent 하게 시작해서 
 - test 프로파일은 `leak-detection-threshold: 0` (Spring context tear-down 이 connection close 보다 늦으면 false positive).
 
 ### Where
-JDBC 사용 8 레포 (realtime-feed-service 는 R2DBC 라 제외).
+JDBC 사용 8 레포 (realtime-feed-service 는 R2DBC, graphql-gateway 는 DB 미사용 — 둘 다 제외).
 
 ### Code
 - `notification-hub/notification-bootstrap/src/main/resources/application.yml`
@@ -47,7 +47,7 @@ JDBC 사용 8 레포 (realtime-feed-service 는 R2DBC 라 제외).
 - actuator 의 `health.probes.enabled: true` + `health.group.{readiness,liveness}` 로 매핑.
 
 ### Where
-9 레포 모두.
+10 레포 모두.
 
 ### Code
 - `notification-hub/notification-bootstrap/src/main/resources/application.yml` (`management.endpoint.health.group`)
@@ -70,7 +70,7 @@ SIGTERM 받자마자 종료하면 in-flight 요청 끊김 + Kafka consumer commi
 - `SmartLifecycle` 로 vendor 호출 / Outbox relay 단계 await
 
 ### Where
-9 레포 모두 (가장 명시적: notification-hub, bid-ask-marketplace).
+10 레포 모두 (가장 명시적: notification-hub, bid-ask-marketplace).
 
 ### Code
 - `notification-hub/notification-bootstrap/src/main/resources/application.yml` (`spring.lifecycle.timeout-per-shutdown-phase: 25s`)
@@ -474,7 +474,7 @@ realtime-feed-service.
 
 ## 종합
 
-9 레포의 ADR 100+ 건이 위 19 패턴 위에 쌓여 있습니다. 같은 패턴이 다른 도메인 (결제 / 검색 / SIEM / GPU 스케줄러 / 실시간 reactive) 에 적용된 모양을 비교하면 어디까지가 일반 패턴이고 어디부터가 도메인 특화인지가 보입니다.
+10 레포의 ADR 100+ 건이 위 19 패턴 위에 쌓여 있습니다. 같은 패턴이 다른 도메인 (결제 / 검색 / SIEM / GPU 스케줄러 / 실시간 reactive) 에 적용된 모양을 비교하면 어디까지가 일반 패턴이고 어디부터가 도메인 특화인지가 보입니다.
 
 각 패턴의 trade-off 와 재검토 시점은 각 레포의 ADR 본문 참조.
 

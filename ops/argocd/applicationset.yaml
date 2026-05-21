@@ -1,6 +1,6 @@
-# ssa1004 portfolio — 9 service GitOps 통합 배포.
+# ssa1004 portfolio — 10 service GitOps 통합 배포.
 #
-# ArgoCD ApplicationSet 하나가 9 개의 Application 을 동시에 생성한다.
+# ArgoCD ApplicationSet 하나가 10 개의 Application 을 동시에 생성한다.
 # 각 service 는 자신의 repo 에 들어있는 Helm chart 를 source 로 사용한다.
 #
 # 적용:
@@ -8,7 +8,7 @@
 #   kubectl apply -f ops/argocd/applicationset.yaml
 #
 # 주의:
-#   - 9 service 모두 helm/<chart-name>/ 위치 (예외 없음).
+#   - 10 service 모두 helm/<chart-name>/ 위치 (예외 없음).
 #   - dev / prod 분기는 applicationset-dev.yaml / applicationset-prod.yaml 참고.
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
