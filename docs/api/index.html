@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ssa1004 · 포트폴리오 API 문서</title>
+  <!--
+    포트폴리오 9 서비스의 OpenAPI spec 통합 뷰어.
+    Redoc standalone (CDN) + 드롭다운으로 spec 전환.
+    각 spec 은 해당 repo main 브랜치의 docs/openapi/<service>.yaml 을 raw 로 가리킨다.
+  -->
+  <style>
+    :root { --bar-h: 56px; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    #bar {
+      height: var(--bar-h);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      background: #1b1b2f;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    #bar strong { font-size: 15px; white-space: nowrap; }
+    #bar .sep { color: #6b6b8a; }
+    #bar select {
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #3a3a5a;
+      background: #2a2a44;
+      color: #fff;
+      cursor: pointer;
+      max-width: 360px;
+    }
+    #bar a { color: #8ab4f8; font-size: 13px; text-decoration: none; margin-left: auto; }
+    #bar a:hover { text-decoration: underline; }
+    #redoc { height: calc(100% - var(--bar-h)); overflow: auto; }
+    #loading { padding: 24px; color: #555; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div id="bar">
+    <strong>포트폴리오 API 문서</strong>
+    <span class="sep">|</span>
+    <label for="spec-select" style="font-size:13px;">서비스</label>
+    <select id="spec-select"></select>
+    <a id="raw-link" href="#" target="_blank" rel="noopener">raw yaml 보기</a>
+  </div>
+  <div id="redoc"><div id="loading">spec 로딩 중…</div></div>
+
+  <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+  <script>
+    // 9 서비스 11 spec. value 는 각 repo main 브랜치 docs/openapi/ 의 raw URL.
+    var SPECS = [
+      { label: "auth-service",                    url: "https://raw.githubusercontent.com/ssa1004/auth-service/main/docs/openapi/auth-service.yaml" },
+      { label: "security-log-search",             url: "https://raw.githubusercontent.com/ssa1004/security-log-search/main/docs/openapi/security-log-search.yaml" },
+      { label: "notification-hub",                url: "https://raw.githubusercontent.com/ssa1004/notification-hub/main/docs/openapi/notification-hub.yaml" },
+      { label: "search-service",                  url: "https://raw.githubusercontent.com/ssa1004/search-service/main/docs/openapi/search-service.yaml" },
+      { label: "billing-platform",                url: "https://raw.githubusercontent.com/ssa1004/billing-platform/main/docs/openapi/billing-platform.yaml" },
+      { label: "resell-orderbook (bid-ask-marketplace)", url: "https://raw.githubusercontent.com/ssa1004/bid-ask-marketplace/main/docs/openapi/resell-orderbook.yaml" },
+      { label: "gpu-job-orchestrator",            url: "https://raw.githubusercontent.com/ssa1004/gpu-job-orchestrator/main/docs/openapi/gpu-job-orchestrator.yaml" },
+      { label: "commerce-ops · order-service",    url: "https://raw.githubusercontent.com/ssa1004/commerce-ops/main/docs/openapi/order-service.yaml" },
+      { label: "commerce-ops · payment-service",  url: "https://raw.githubusercontent.com/ssa1004/commerce-ops/main/docs/openapi/payment-service.yaml" },
+      { label: "commerce-ops · inventory-service",url: "https://raw.githubusercontent.com/ssa1004/commerce-ops/main/docs/openapi/inventory-service.yaml" },
+      { label: "realtime-feed-service",           url: "https://raw.githubusercontent.com/ssa1004/realtime-feed-service/main/docs/openapi/realtime-feed-service.yaml" }
+    ];
+
+    var select = document.getElementById("spec-select");
+    var rawLink = document.getElementById("raw-link");
+
+    SPECS.forEach(function (s, i) {
+      var opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = s.label;
+      select.appendChild(opt);
+    });
+
+    function render(index) {
+      var spec = SPECS[index];
+      rawLink.href = spec.url;
+      Redoc.init(
+        spec.url,
+        { scrollYOffset: "#bar", expandResponses: "200,201", hideDownloadButton: false },
+        document.getElementById("redoc")
+      );
+    }
+
+    select.addEventListener("change", function () {
+      render(Number(select.value));
+    });
+
+    // URL 해시(#index)로 진입 시 해당 spec 선택. 없으면 첫 spec.
+    var initial = parseInt((location.hash || "").replace("#", ""), 10);
+    if (isNaN(initial) || initial < 0 || initial >= SPECS.length) initial = 0;
+    select.value = String(initial);
+    render(initial);
+  </script>
+</body>
+</html>

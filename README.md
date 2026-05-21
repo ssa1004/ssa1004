@@ -65,6 +65,12 @@ graph TB
 
 ---
 
+## API 문서
+
+각 REST 서비스는 빌드 시 `springdoc-openapi-gradle-plugin` 으로 OpenAPI 3 spec 을 export 하고, 그 spec 들을 [`docs/api/`](./docs/api/) 에 한곳으로 모았습니다. [`docs/api/README.md`](./docs/api/README.md) 에 9 서비스 spec 의 raw 링크 표와 Redoc / Swagger UI 로 보는 법이 있고, [`docs/api/index.html`](./docs/api/index.html) 은 드롭다운으로 여러 spec 을 한 화면에서 탐색하는 Redoc 통합 뷰어입니다. 모인 spec 은 클라이언트 SDK codegen 의 입력으로도 쓸 수 있습니다.
+
+---
+
 ## 공통 운영 패턴
 
 같은 패턴이 9 레포에 반복 적용되어 있습니다. 한 레포에서 본 패턴을 다른 레포에서 그대로 찾을 수 있습니다.
