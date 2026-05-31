@@ -463,7 +463,7 @@ realtime-feed-service.
 
 ### Code
 - `realtime-feed-service/feed-adapter-out/src/main/kotlin/com/example/feed/adapter/outbound/kafka/TradeMatchedConsumer.kt` (`@PreDestroy` + `scope.cancel()`)
-- `realtime-feed-service/docs/adr/0010-structured-concurrency.md`
+- `realtime-feed-service/docs/adr/0010-coroutines-structured-concurrency.md`
 
 ### Notes
 - `GlobalScope.launch { }` 사용 절대 금지 (root scope, cancellation 안 됨).
